@@ -292,21 +292,22 @@ app.put("/update-is-favourite/:id", authenticateToken, async (req, res) => {
     const { isFavourite } = req.body;
     const { userId } = req.user;
 
-    try{
-        const travelStory = await TravelStory.findOne({_id: id, userId: this.userId});
+    try {
+        const travelStory = await TravelStory.findOne({ _id: id, userId: userId });
 
         if (!travelStory) {
-            return res.status(404).json({ error: true, message: "Travel story not found"});
+            return res.status(404).json({ error: true, message: "Travel story not found" });
         }
 
         travelStory.isFavourite = isFavourite;
-
         await travelStory.save();
-        res.status(200).json({story:travelStory, message:'Update Successfull'});
-    }catch (error){
-        res.status(500).json({error: true, message: error.message});
+
+        res.status(200).json({ story: travelStory, message: 'Update Successful' });
+    } catch (error) {
+        res.status(500).json({ error: true, message: error.message });
     }
-})
+});
+
 
 //search travel stories
 app.post("/search", authenticateToken, async (req, res) => {
@@ -321,9 +322,9 @@ app.post("/search", authenticateToken, async (req, res) => {
        const searchResults = await TravelStory.find({
         userId: userId,
         $or: [
-            { title: { $regex: quary, $options: "i"}},
-            { story: { $regex: quary, $options: "i"}},
-            { visitedLocation: { $regex: quary, $options: "i"}},
+            { title: { $regex: query, $options: "i"}},
+            { story: { $regex: query, $options: "i"}},
+            { visitedLocation: { $regex: query, $options: "i"}},
         ],
        }).sort({ isFavourite: -1 });
 
@@ -335,7 +336,7 @@ app.post("/search", authenticateToken, async (req, res) => {
 
 //filter travel stories by date
 app.get("/travel-stories/filter", authenticateToken, async (req, res) => {
-    const { startDate, endDate } = req.quary;
+    const { startDate, endDate } = req.query;
     const { userId } = req.user;
 
     try {
